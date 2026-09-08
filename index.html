@@ -3,128 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iQOO AEGIS - Web Edition</title>
+    <title>iQOO AEGIS — Trusted Emergency Intelligence</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .card { background: #1e1e1e; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        h2 { margin-top: 0; color: #00e676; font-size: 24px; }
-        .telemetry { background: #000; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 14px; color: #00e676; margin: 16px 0; }
-        button { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-red { background: #d32f2f; color: white; }
-        .btn-orange { background: #f57c00; color: white; }
-        .btn-primary { background: #2979ff; color: white; }
-        .status-armed { color: #00e676; }
-        .status-incident { color: #ff5252; }
+        :root { background-color: #0f1115; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 1100px; }
+        header { display: flex; justify-content: space-between; align-items: center; background: #161922; padding: 16px 24px; border-radius: 12px; border: 1px solid #232733; margin-bottom: 20px; }
+        .badge { background: #00bcd4; color: #000; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .card { background: #161922; border: 1px solid #232733; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .card h3 { margin-top: 0; font-size: 14px; color: #8c9ba5; letter-spacing: 0.5px; }
+        .metric { font-size: 48px; font-weight: 800; color: #fff; margin: 10px 0; }
+        .status-pill { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #2a2e3d; color: #ffb74d; }
+        .btn-action { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
+        .btn-yellow { background: #fbc02d; color: #000; margin-bottom: 12px; }
+        .btn-yellow:hover { background: #f9a825; }
+        .btn-dark { background: #232733; color: #fff; border: 1px solid #3b4255; }
+        .telemetry-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 13px; color: #a0aec0; margin: 6px 0; }
     </style>
 </head>
 <body>
 
-<div class="card" id="appCard">
-    <h2 id="statusTitle">🛡 AEGIS ARMED</h2>
-    <p>System State: <span id="stateText" class="status-armed">ARMED</span></p>
-    
-    <div class="telemetry">
-        <div>ACCEL X: <span id="accelX">0.00</span> m/s²</div>
-        <div>ACCEL Y: <span id="accelY">0.00</span> m/s²</div>
-        <div>ACCEL Z: <span id="accelZ">9.80</span> m/s²</div>
-        <div style="margin-top: 8px; color: #aaa;">Event Confidence: <span id="eventScore">0</span>%</div>
-        <div style="color: #aaa;">Location Trust: <span id="locScore">100</span>%</div>
+<div class="container">
+    <header>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">🛡️</span>
+            <div>
+                <h2 style="margin: 0; font-size: 18px; color: #fff;">iQOO AEGIS</h2>
+                <span style="font-size: 12px; color: #8c9ba5;">Distributed Trust Engine & Physics Guard</span>
+            </div>
+        </div>
+        <div class="badge"><span>●</span> AEGIS ARMED</div>
+    </header>
+
+    <div class="grid">
+        <!-- Event Confidence Card -->
+        <div class="card">
+            <h3>KINEMATIC EMERGENCY DETECTION</h3>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <div class="metric" id="eventScoreDisplay">0%</div>
+                <span class="status-pill" id="eventStatusBadge">NORMAL</span>
+            </div>
+            <div style="margin-top: 16px;">
+                <div class="telemetry-row"><span>Impact Magnitude:</span> <span id="teleAccel">0.00 m/s²</span></div>
+                <div class="telemetry-row"><span>Rotation Velocity:</span> <span id="teleGyro">0.00 rad/s</span></div>
+            </div>
+        </div>
+
+        <!-- Location Trust Card -->
+        <div class="card">
+            <h3>PHYSICAL GNSS VERIFICATION</h3>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <div class="metric" id="locScoreDisplay">100%</div>
+                <span class="status-pill" style="background: #1b5e20; color: #81c784;" id="locStatusBadge">TRUSTED</span>
+            </div>
+            <div style="margin-top: 16px;">
+                <div class="telemetry-row"><span>GPS Latitude:</span> <span id="gpsLat">Acquiring...</span></div>
+                <div class="telemetry-row"><span>GPS Longitude:</span> <span id="gpsLng">Acquiring...</span></div>
+            </div>
+        </div>
     </div>
 
-    <div id="controls">
-        <p style="font-size: 12px; color: #888; text-align: center; margin-bottom: 4px;">DEMO SIMULATION CONTROLS</p>
-        <button class="btn-red" onclick="simulateEmergency()">SIMULATE VERIFIED EMERGENCY</button>
-        <button class="btn-orange" onclick="simulateUntrusted()">SIMULATE UNTRUSTED LOCATION</button>
+    <!-- Controls Card -->
+    <div class="card" style="text-align: center;">
+        <button class="btn-action btn-yellow" onclick="simulateVerifiedEmergency()">⚠️ SIMULATE VERIFIED EMERGENCY CRASH</button>
+        <button class="btn-action btn-dark" onclick="resetSystem()">🔄 RESET SYSTEM MONITORING</button>
     </div>
 </div>
 
 <script>
-    // --- AEGIS WEB ENGINES ---
-    let appState = "ARMED";
-
-    function analyzeSensorData(ax, ay, az) {
-        let accelMagnitude = Math.sqrt((ax * ax) + (ay * ay) + (az * az));
-        let isImpact = accelMagnitude > 30;
-        let score = isImpact ? 91 : 0;
-        
-        document.getElementById('accelX').innerText = ax.toFixed(2);
-        document.getElementById('accelY').innerText = ay.toFixed(2);
-        document.getElementById('accelZ').innerText = az.toFixed(2);
-        document.getElementById('eventScore').innerText = score;
-
-        if (isImpact && appState === "ARMED") {
-            triggerIncident(score, 94, "VERIFIED");
-        }
+    // Request Browser Geolocation Immediately (Triggers the permission prompt just like the screenshot)
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+            (position) => {
+                document.getElementById('gpsLat').innerText = position.coords.latitude.toFixed(4);
+                document.getElementById('gpsLng').innerText = position.coords.longitude.toFixed(4);
+            },
+            (error) => {
+                document.getElementById('gpsLat').innerText = "Permission Denied";
+                document.getElementById('gpsLng').innerText = "Using Last Known";
+            },
+            { enableHighAccuracy: true }
+        );
     }
 
-    // Hook into real browser motion sensors if available on phone web
+    // Live Device Motion Sensors
     if (window.DeviceMotionEvent) {
         window.addEventListener('devicemotion', (event) => {
             let ax = event.acceleration.x || 0;
             let ay = event.acceleration.y || 0;
-            let az = event.acceleration.z || 9.8;
-            if(appState === "ARMED") analyzeSensorData(ax, ay, az);
+            let az = event.acceleration.z || 0;
+            let magnitude = Math.sqrt(ax*ax + ay*ay + az*az);
+            
+            document.getElementById('teleAccel').innerText = magnitude.toFixed(2) + " m/s²";
+            
+            if (magnitude > 25) {
+                simulateVerifiedEmergency();
+            }
         });
     }
 
-    function simulateEmergency() {
-        triggerIncident(91, 94, "VERIFIED");
-    }
-
-    function simulateUntrusted() {
-        triggerIncident(91, 17, "FAILED");
-    }
-
-    function triggerIncident(eventScore, locScore, integrity) {
-        appState = "INCIDENT";
-        document.getElementById('statusTitle').innerText = integrity === "VERIFIED" ? "⚠ INCIDENT DETECTED" : "⚠ LOCATION UNTRUSTED";
-        document.getElementById('statusTitle').style.color = integrity === "VERIFIED" ? "#ff5252" : "#ff9100";
-        document.getElementById('stateText').innerText = appState;
-        document.getElementById('stateText').className = "status-incident";
+    function simulateVerifiedEmergency() {
+        document.getElementById('eventScoreDisplay').innerText = "91%";
+        document.getElementById('eventStatusBadge').innerText = "SEVERE CRASH";
+        document.getElementById('eventStatusBadge').style.background = "#b71c1c";
+        document.getElementById('eventStatusBadge').style.color = "#ffcdd2";
         
-        document.getElementById('eventScore').innerText = eventScore;
-        document.getElementById('locScore').innerText = locScore;
-
-        document.getElementById('controls').innerHTML = `
-            <p style="text-align: center; font-weight: bold;">Are you OK?</p>
-            <button class="btn-primary" onclick="resetSystem()">I'M OK - CANCEL</button>
-            <button class="btn-red" onclick="escalate(${eventScore}, ${locScore}, '${integrity}')">SIMULATE ESCALATE</button>
-        `;
-    }
-
-    function escalate(eventScore, locScore, integrity) {
-        appState = "ESCALATED";
-        document.getElementById('statusTitle').innerText = "🚨 ESCALATED";
-        document.getElementById('stateText').innerText = appState;
-
-        let reason = integrity === "VERIFIED" ? "Event and location verified." : "GNSS trajectory conflicts with physical movement.";
-
-        document.getElementById('controls').innerHTML = `
-            <div style="font-size: 12px; background: #111; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
-                <strong>INCIDENT PACKET:</strong><br>
-                Confidence: ${eventScore}%<br>
-                Trust: ${locScore}%<br>
-                Integrity: ${integrity}<br>
-                <strong>Reason:</strong> ${reason}
-            </div>
-            <button class="btn-primary" onclick="resetSystem()">RESET SYSTEM</button>
-        `;
+        document.getElementById('locScoreDisplay').innerText = "94%";
     }
 
     function resetSystem() {
-        appState = "ARMED";
-        document.getElementById('statusTitle').innerText = "🛡 AEGIS ARMED";
-        document.getElementById('statusTitle').style.color = "#00e676";
-        document.getElementById('stateText').innerText = appState;
-        document.getElementById('stateText').className = "status-armed";
-        document.getElementById('locScore').innerText = "100";
-        document.getElementById('eventScore').innerText = "0";
-
-        document.getElementById('controls').innerHTML = `
-            <p style="font-size: 12px; color: #888; text-align: center; margin-bottom: 4px;">DEMO SIMULATION CONTROLS</p>
-            <button class="btn-red" onclick="simulateEmergency()">SIMULATE VERIFIED EMERGENCY</button>
-            <button class="btn-orange" onclick="simulateUntrusted()">SIMULATE UNTRUSTED LOCATION</button>
-        `;
+        document.getElementById('eventScoreDisplay').innerText = "0%";
+        document.getElementById('eventStatusBadge').innerText = "NORMAL";
+        document.getElementById('eventStatusBadge').style.background = "#2a2e3d";
+        document.getElementById('eventStatusBadge').style.color = "#ffb74d";
+        
+        document.getElementById('locScoreDisplay').innerText = "100%";
     }
 </script>
 
