@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iQOO AEGIS - Web Edition</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { background: #1e1e1e; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        h2 { margin-top: 0; color: #00e676; font-size: 24px; }
+        .telemetry { background: #000; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 14px; color: #00e676; margin: 16px 0; }
+        button { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-red { background: #d32f2f; color: white; }
+        .btn-orange { background: #f57c00; color: white; }
+        .btn-primary { background: #2979ff; color: white; }
+        .status-armed { color: #00e676; }
+        .status-incident { color: #ff5252; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="appCard">
+    <h2 id="statusTitle">🛡 AEGIS ARMED</h2>
+    <p>System State: <span id="stateText" class="status-armed">ARMED</span></p>
+    
+    <div class="telemetry">
+        <div>ACCEL X: <span id="accelX">0.00</span> m/s²</div>
+        <div>ACCEL Y: <span id="accelY">0.00</span> m/s²</div>
+        <div>ACCEL Z: <span id="accelZ">9.80</span> m/s²</div>
+        <div style="margin-top: 8px; color: #aaa;">Event Confidence: <span id="eventScore">0</span>%</div>
+        <div style="color: #aaa;">Location Trust: <span id="locScore">100</span>%</div>
+    </div>
+
+    <div id="controls">
+        <p style="font-size: 12px; color: #888; text-align: center; margin-bottom: 4px;">DEMO SIMULATION CONTROLS</p>
+        <button class="btn-red" onclick="simulateEmergency()">SIMULATE VERIFIED EMERGENCY</button>
+        <button class="btn-orange" onclick="simulateUntrusted()">SIMULATE UNTRUSTED LOCATION</button>
+    </div>
+</div>
+
+<script>
+    // --- AEGIS WEB ENGINES ---
+    let appState = "ARMED";
+
+    function analyzeSensorData(ax, ay, az) {
+        let accelMagnitude = Math.sqrt((ax * ax) + (ay * ay) + (az * az));
+        let isImpact = accelMagnitude > 30;
+        let score = isImpact ? 91 : 0;
+        
+        document.getElementById('accelX').innerText = ax.toFixed(2);
+        document.getElementById('accelY').innerText = ay.toFixed(2);
+        document.getElementById('accelZ').innerText = az.toFixed(2);
+        document.getElementById('eventScore').innerText = score;
+
+        if (isImpact && appState === "ARMED") {
+            triggerIncident(score, 94, "VERIFIED");
+        }
+    }
+
+    // Hook into real browser motion sensors if available on phone web
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', (event) => {
+            let ax = event.acceleration.x || 0;
+            let ay = event.acceleration.y || 0;
+            let az = event.acceleration.z || 9.8;
+            if(appState === "ARMED") analyzeSensorData(ax, ay, az);
+        });
+    }
+
+    function simulateEmergency() {
+        triggerIncident(91, 94, "VERIFIED");
+    }
+
+    function simulateUntrusted() {
+        triggerIncident(91, 17, "FAILED");
+    }
+
+    function triggerIncident(eventScore, locScore, integrity) {
+        appState = "INCIDENT";
+        document.getElementById('statusTitle').innerText = integrity === "VERIFIED" ? "⚠ INCIDENT DETECTED" : "⚠ LOCATION UNTRUSTED";
+        document.getElementById('statusTitle').style.color = integrity === "VERIFIED" ? "#ff5252" : "#ff9100";
+        document.getElementById('stateText').innerText = appState;
+        document.getElementById('stateText').className = "status-incident";
+        
+        document.getElementById('eventScore').innerText = eventScore;
+        document.getElementById('locScore').innerText = locScore;
+
+        document.getElementById('controls').innerHTML = `
+            <p style="text-align: center; font-weight: bold;">Are you OK?</p>
+            <button class="btn-primary" onclick="resetSystem()">I'M OK - CANCEL</button>
+            <button class="btn-red" onclick="escalate(${eventScore}, ${locScore}, '${integrity}')">SIMULATE ESCALATE</button>
+        `;
+    }
+
+    function escalate(eventScore, locScore, integrity) {
+        appState = "ESCALATED";
+        document.getElementById('statusTitle').innerText = "🚨 ESCALATED";
+        document.getElementById('stateText').innerText = appState;
+
+        let reason = integrity === "VERIFIED" ? "Event and location verified." : "GNSS trajectory conflicts with physical movement.";
+
+        document.getElementById('controls').innerHTML = `
+            <div style="font-size: 12px; background: #111; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                <strong>INCIDENT PACKET:</strong><br>
+                Confidence: ${eventScore}%<br>
+                Trust: ${locScore}%<br>
+                Integrity: ${integrity}<br>
+                <strong>Reason:</strong> ${reason}
+            </div>
+            <button class="btn-primary" onclick="resetSystem()">RESET SYSTEM</button>
+        `;
+    }
+
+    function resetSystem() {
+        appState = "ARMED";
+        document.getElementById('statusTitle').innerText = "🛡 AEGIS ARMED";
+        document.getElementById('statusTitle').style.color = "#00e676";
+        document.getElementById('stateText').innerText = appState;
+        document.getElementById('stateText').className = "status-armed";
+        document.getElementById('locScore').innerText = "100";
+        document.getElementById('eventScore').innerText = "0";
+
+        document.getElementById('controls').innerHTML = `
+            <p style="font-size: 12px; color: #888; text-align: center; margin-bottom: 4px;">DEMO SIMULATION CONTROLS</p>
+            <button class="btn-red" onclick="simulateEmergency()">SIMULATE VERIFIED EMERGENCY</button>
+            <button class="btn-orange" onclick="simulateUntrusted()">SIMULATE UNTRUSTED LOCATION</button>
+        `;
+    }
+</script>
+
+</body>
+</html>
